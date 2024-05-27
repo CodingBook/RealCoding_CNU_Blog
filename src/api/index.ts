@@ -5,7 +5,7 @@ const instance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  baseURL: 'http://34.64.250.51:8080/',
+  baseURL: 'https://34.64.250.51:8080/',
 });
 
 // todo (6) api 작성

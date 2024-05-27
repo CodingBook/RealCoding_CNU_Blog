@@ -65,7 +65,7 @@ const Layout = () => {
           />
         </div>
         <div>
-          <Name>수정</Name>
+          <Name>seunghyeoks</Name>
           <Description>2024 실전코딩</Description>
         </div>
       </Profile>

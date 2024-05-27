@@ -1,8 +1,10 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { createPost, getPostById, updatePostById } from '../api';
 import { TAG } from '../api/types';
+import useGetPostById from "../queries/useGetPostById.ts";
+import useUpdatePostById from "../queries/useUpdatePostById.ts";
+import useCreatePost from "../queries/useCreatePost.ts";
 
 const TitleInput = styled.input`
   display: block;
@@ -85,16 +87,28 @@ const SaveButton = styled.button`
 `;
 
 const Write = () => {
+  const { state } = useLocation();
+  const isEdit = state?.postId;
+
   const [title, setTitle] = useState('');
   const [contents, setContents] = useState('');
   const [tag, setTag] = useState<TAG>(TAG.REACT);
+
   const tagList = Object.keys(TAG);
 
   const navigate = useNavigate();
 
-  const requestCreatePost = async () => {
-    await createPost(title, contents, tag);
-  };
+  const {data: post, isSuccess: isSuccessfetchPost} = useGetPostById(state?.postId);
+  const {mutate: createPost, isSuccess: isCreationSuccess} = useCreatePost();
+  const {mutate: updatePost, isSuccess: isUpdateSuccess} = useUpdatePostById();
+
+  useEffect(() => {
+    if (isSuccessfetchPost) {
+      setTitle(post?.title);
+      setContents(post?.contents);
+      setTag(post?.tag);
+    }
+  }, [isSuccessfetchPost]);
 
   const clickConfirm = () => {
     if (!title || !contents) {
@@ -102,7 +116,12 @@ const Write = () => {
       return;
     }
 
-    requestCreatePost();
+    if (isEdit)
+      updatePost({postId: state.postId, title, contents, tag});
+    else
+      createPost({title, contents, tag})
+
+    if (isCreationSuccess || isUpdateSuccess)
     navigate('/');
   };
 
